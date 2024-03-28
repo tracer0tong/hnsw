@@ -12,13 +12,13 @@ export class HNSWWithDB extends HNSW {
   dbName: string;
   db: IDBPDatabase<HNSWDB> | null = null;
 
-  private constructor(M: number, efConstruction: number, dbName: string) {
-    super(M, efConstruction);
+  private constructor(M: number, efConstruction: number, d: number, dbName: string) {
+    super(M, efConstruction, d);
     this.dbName = dbName;
   }
 
-  static async create(M: number, efConstruction: number, dbName: string) {
-    const instance = new HNSWWithDB(M, efConstruction, dbName);
+  static async create(M: number, efConstruction: number, d: number, dbName: string) {
+    const instance = new HNSWWithDB(M, efConstruction, d, dbName);
     await instance.initDB();
     return instance;
   }
