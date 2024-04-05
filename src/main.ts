@@ -11,8 +11,8 @@ export class HNSW {
   M: number; // Max number of neighbors
   efConstruction: number; // Max number of nodes to visit during construction
   levelMax: number; // Max level of the graph
-  entryPointId: number; // Id of the entry point
-  nodes: Map<number, Node>; // Map of nodes
+  entryPointId: string; // Id of the entry point
+  nodes: Map<string, Node>; // Map of nodes
   probs: number[]; // Probabilities for the levels
 
   constructor(M = 16, efConstruction = 200, d: number | null = null, metric = 'cosine') {
@@ -20,8 +20,8 @@ export class HNSW {
     this.d = d;
     this.M = M;
     this.efConstruction = efConstruction;
-    this.entryPointId = -1;
-    this.nodes = new Map<number, Node>();
+    this.entryPointId = '';
+    this.nodes = new Map<string, Node>();
     this.probs = this.set_probs(M, 1 / Math.log(M));
     this.levelMax = this.probs.length - 1;
     this.similarityFunction = this.getMetric(metric as Metric);
@@ -61,7 +61,7 @@ export class HNSW {
   }
 
   private async addNodeToGraph(node: Node) {
-    if (this.entryPointId === -1) {
+    if (this.entryPointId === '') {
       this.entryPointId = node.id;
       return;
     }
@@ -75,7 +75,7 @@ export class HNSW {
         let maxSimilarity = -Infinity;
 
         for (const neighborId of currentNode.neighbors[level]) {
-          if (neighborId === -1) break;
+          if (neighborId === '') break;
 
           const neighborNode = this.nodes.get(neighborId)!;
           const similarity = this.similarityFunction(node.vector, neighborNode.vector);
@@ -97,7 +97,7 @@ export class HNSW {
     const closestLevel = Math.min(node.level, closestNode.level);
     for (let level = 0; level <= closestLevel; level++) {
       // Add new neighbor to closestNode's neighbors
-      closestNode.neighbors[level] = closestNode.neighbors[level].filter((id) => id !== -1);
+      closestNode.neighbors[level] = closestNode.neighbors[level].filter((id) => id !== '');
       closestNode.neighbors[level].push(node.id);
       // If the number of neighbors exceeds M, remove the farthest one
       if (closestNode.neighbors[level].length > this.M) {
@@ -105,7 +105,7 @@ export class HNSW {
       }
 
       // Add new neighbor to node's neighbors
-      node.neighbors[level] = node.neighbors[level].filter((id) => id !== -1);
+      node.neighbors[level] = node.neighbors[level].filter((id) => id !== '');
       node.neighbors[level].push(closestNode.id);
       // If the number of neighbors exceeds M, remove the farthest one
       if (node.neighbors[level].length > this.M) {
@@ -114,7 +114,10 @@ export class HNSW {
     }
   }
 
-  async addPoint(id: number, vector: Float32Array | number[]) {
+  async addPoint(id: string, vector: Float32Array | number[]) {
+    if (id === '') {
+      throw new Error('Id cannot be empty');
+    }
     if (this.d !== null && vector.length !== this.d) {
       throw new Error('All vectors must be of the same dimension');
     }
@@ -127,11 +130,11 @@ export class HNSW {
     await this.addNodeToGraph(node);
   }
 
-  searchKNN(query: Float32Array | number[], k: number): { id: number; score: number }[] {
-    const result: { id: number; score: number }[] = [];
-    const visited: Set<number> = new Set<number>();
+  searchKNN(query: Float32Array | number[], k: number): { id: string; score: number }[] {
+    const result: { id: string; score: number }[] = [];
+    const visited: Set<string> = new Set<string>();
 
-    const candidates = new PriorityQueue<number>((a, b) => {
+    const candidates = new PriorityQueue<string>((a, b) => {
       const aNode = this.nodes.get(a)!;
       const bNode = this.nodes.get(b)!;
       return this.similarityFunction(query, bNode.vector) - this.similarityFunction(query, aNode.vector);
@@ -172,11 +175,11 @@ export class HNSW {
     return result.slice(0, k);
   }
 
-  async buildIndex(data: { id: number; vector: Float32Array | number[] }[]) {
+  async buildIndex(data: { id: string; vector: Float32Array | number[] }[]) {
     // Clear existing index
     this.nodes.clear();
     this.levelMax = 0;
-    this.entryPointId = -1;
+    this.entryPointId = '';
 
     // Add points to the index
     for (const item of data) {

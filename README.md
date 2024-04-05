@@ -25,11 +25,11 @@ const hnsw = new HNSW(200, 16, 5, 'cosine');
 
 // Make some data
 const data = [
-{id: 1, vector: [1, 2, 3, 4, 5]},
-{id: 2, vector: [2, 3, 4, 5, 6]},
-{id: 3, vector: [3, 4, 5, 6, 7]},
-{id: 4, vector: [4, 5, 6, 7, 8]},
-{id: 5, vector: [5, 6, 7, 8, 9]}
+{id: '1', vector: [1, 2, 3, 4, 5]},
+{id: '2', vector: [2, 3, 4, 5, 6]},
+{id: '3', vector: [3, 4, 5, 6, 7]},
+{id: '4', vector: [4, 5, 6, 7, 8]},
+{id: '5', vector: [5, 6, 7, 8, 9]}
 ]
 
 // Build the index
@@ -49,11 +49,11 @@ const index = await HNSWWithDB.create(200, 16, 'my-index');
 
 // Make some data
 const data = [
-{id: 1, vector: [1, 2, 3, 4, 5]},
-{id: 2, vector: [2, 3, 4, 5, 6]},
-{id: 3, vector: [3, 4, 5, 6, 7]},
-{id: 4, vector: [4, 5, 6, 7, 8]},
-{id: 5, vector: [5, 6, 7, 8, 9]}
+{id: '1', vector: [1, 2, 3, 4, 5]},
+{id: '2', vector: [2, 3, 4, 5, 6]},
+{id: '3', vector: [3, 4, 5, 6, 7]},
+{id: '4', vector: [4, 5, 6, 7, 8]},
+{id: '5', vector: [5, 6, 7, 8, 9]}
 ]
 
 // Build the index
