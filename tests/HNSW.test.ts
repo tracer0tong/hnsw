@@ -38,7 +38,7 @@ async function main(): Promise<{ id: string; score: number }[]> {
 test('HNSW', async () => {
   const results = await main();
   expect(results).toEqual([
-    { id: 1, score: 0.9649505047327671 },
-    { id: 2, score: 0.9864400504156211 },
+    { id: '1', score: 0.9649505047327671 },
+    { id: '2', score: 0.9864400504156211 },
   ]);
 });
